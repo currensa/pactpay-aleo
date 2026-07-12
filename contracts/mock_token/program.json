@@ -1,0 +1,6 @@
+{
+  "program": "mock_token.aleo",
+  "version": "0.1.0",
+  "license": "MIT",
+  "description": "Mock private token used by the PactPay payroll demo"
+}

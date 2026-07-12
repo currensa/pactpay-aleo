@@ -1,0 +1,71 @@
+{
+  "config": {
+    "address": "aleo17c69phd8lzdtzc8tscew6l7eamunv57lmwa5jst7zshhzscufqgswrnvvx",
+    "network": "testnet",
+    "endpoint": "https://api.explorer.provable.com/v1",
+    "consensus_version": 15
+  },
+  "deployments": [
+    {
+      "program_id": "payroll_private_v2.aleo",
+      "transaction_id": "at1rtdprqptlqtcyjghdpjpzdnqmkaeyyzafc5g00u8jpnf7qxqxgfq0sk2s2",
+      "stats": {
+        "program_size_bytes": 8334,
+        "max_program_size_bytes": 512000,
+        "total_variables": 1057011,
+        "total_constraints": 863965,
+        "max_variables": 2097152,
+        "max_constraints": 2097152,
+        "storage_cost": 11458000,
+        "namespace_cost": 1000000,
+        "synthesis_cost": 1920976,
+        "constructor_cost": 2000,
+        "priority_fee": 0,
+        "total_cost": 14380976,
+        "function_costs": [
+          {
+            "name": "fund_credits_escrow",
+            "finalize_cost": 1974,
+            "storage_cost": 2842,
+            "execution_cost": 4816,
+            "has_dynamic_calls": true
+          },
+          {
+            "name": "fund_arc_escrow",
+            "finalize_cost": 668,
+            "has_dynamic_calls": true
+          },
+          {
+            "name": "deposit_one",
+            "finalize_cost": 0,
+            "storage_cost": 2530,
+            "execution_cost": 2530
+          },
+          {
+            "name": "deposit_16",
+            "finalize_cost": 0,
+            "storage_cost": 24655,
+            "execution_cost": 24655
+          },
+          {
+            "name": "withdraw_credits_from_escrow",
+            "finalize_cost": 3315,
+            "storage_cost": 4067,
+            "execution_cost": 7382,
+            "has_dynamic_calls": true
+          },
+          {
+            "name": "withdraw_arc_from_escrow",
+            "finalize_cost": 2009,
+            "has_dynamic_calls": true
+          }
+        ]
+      },
+      "broadcast": {
+        "fee_id": "au1cy4krgtl2jm30p902jshs3kgyntvg8406h6c8shggdmkqtjxw5rs4z7gdt",
+        "fee_transaction_id": "at1ghzftvfdk0wmlhcdmzgsqg9zzq7cfd3m9qxt6lvj2auh7rddaqgqamxe6e",
+        "confirmed": true
+      }
+    }
+  ]
+}

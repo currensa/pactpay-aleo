@@ -1,0 +1,18 @@
+{
+  "name": "pactpay-aleo",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "apps/web",
+    "packages/aleo-artifacts"
+  ],
+  "scripts": {
+    "web": "npm run start -w apps/web",
+    "build": "npm run build -w apps/web",
+    "lint": "npm run lint -w apps/web",
+    "test": "leo test --path contracts/payroll_private",
+    "aleo": "node --experimental-strip-types scripts/aleo-tools.ts",
+    "deploy:testnet": "node --experimental-strip-types scripts/deploy.ts"
+  }
+}

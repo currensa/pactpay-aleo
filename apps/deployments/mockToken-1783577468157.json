@@ -1,0 +1,77 @@
+{
+  "config": {
+    "address": "aleo17c69phd8lzdtzc8tscew6l7eamunv57lmwa5jst7zshhzscufqgswrnvvx",
+    "network": "testnet",
+    "endpoint": "https://api.explorer.provable.com/v1",
+    "consensus_version": 15
+  },
+  "deployments": [
+    {
+      "program_id": "mock_token.aleo",
+      "transaction_id": "at1376ha0gcasg8ajz67evw5r2ge8pejpg8udjp55empnzw0z5fauqstgcttu",
+      "stats": {
+        "program_size_bytes": 3194,
+        "max_program_size_bytes": 512000,
+        "total_variables": 393429,
+        "total_constraints": 310020,
+        "max_variables": 2097152,
+        "max_constraints": 2097152,
+        "storage_cost": 8232000,
+        "namespace_cost": 1000000,
+        "synthesis_cost": 703449,
+        "constructor_cost": 2000,
+        "priority_fee": 0,
+        "total_cost": 9937449,
+        "function_costs": [
+          {
+            "name": "mint_public",
+            "finalize_cost": 652,
+            "storage_cost": 1380,
+            "execution_cost": 2032
+          },
+          {
+            "name": "transfer_public",
+            "finalize_cost": 1345,
+            "storage_cost": 1426,
+            "execution_cost": 2771
+          },
+          {
+            "name": "transfer_public_as_signer",
+            "finalize_cost": 1345,
+            "storage_cost": 1446,
+            "execution_cost": 2791
+          },
+          {
+            "name": "mint_private",
+            "finalize_cost": 0,
+            "storage_cost": 1706,
+            "execution_cost": 1706
+          },
+          {
+            "name": "split_private",
+            "finalize_cost": 0,
+            "storage_cost": 2646,
+            "execution_cost": 2646
+          },
+          {
+            "name": "transfer_private",
+            "finalize_cost": 0,
+            "storage_cost": 2649,
+            "execution_cost": 2649
+          },
+          {
+            "name": "burn_to_receipt",
+            "finalize_cost": 0,
+            "storage_cost": 2094,
+            "execution_cost": 2094
+          }
+        ]
+      },
+      "broadcast": {
+        "fee_id": "au1aqmlj62mzhhlyh45u9dreef66k5q22fkyx4z2whp0qurtxv6fq8qwyxlv6",
+        "fee_transaction_id": "at17axs27tk30hgry8ezgtp0ge0dkw3fz6ql5q5g6wrgg9cqgygmg8qy6t8nc",
+        "confirmed": true
+      }
+    }
+  ]
+}

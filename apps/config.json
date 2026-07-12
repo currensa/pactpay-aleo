@@ -1,0 +1,33 @@
+{
+  "network": "testnet",
+  "endpoint": "https://api.explorer.provable.com/v1",
+  "contracts": {
+    "mockToken": {
+      "programId": "mock_token.aleo",
+      "path": "contracts/mock_token",
+      "deployment": {
+        "network": "testnet",
+        "endpoint": "https://api.explorer.provable.com/v1",
+        "broadcast": true,
+        "transactionId": "at1376ha0gcasg8ajz67evw5r2ge8pejpg8udjp55empnzw0z5fauqstgcttu",
+        "jsonOutput": "apps/deployments/mockToken-1783577468157.json",
+        "deployedAt": "2026-07-09T06:11:52.302Z",
+        "preparedAt": null
+      }
+    },
+    "payrollPrivate": {
+      "programId": "payroll_private_v2.aleo",
+      "path": "contracts/payroll_private",
+      "deployment": {
+        "network": "testnet",
+        "endpoint": "https://api.explorer.provable.com/v1",
+        "broadcast": true,
+        "transactionId": "at1rtdprqptlqtcyjghdpjpzdnqmkaeyyzafc5g00u8jpnf7qxqxgfq0sk2s2",
+        "jsonOutput": "apps/deployments/payrollPrivate-1783586392360.json",
+        "deployedAt": "2026-07-09T08:41:16.058Z",
+        "preparedAt": null
+      }
+    }
+  },
+  "updatedAt": "2026-07-09T08:41:16.058Z"
+}

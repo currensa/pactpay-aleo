@@ -1,0 +1,23 @@
+{
+  "program": "payroll_private_v2.aleo",
+  "version": "0.1.0",
+  "description": "Private payroll notes with partial withdrawal support",
+  "license": "MIT",
+  "leo": "4.2.0",
+  "dependencies": [
+    {
+      "name": "credits.aleo",
+      "location": "network",
+      "path": null,
+      "edition": null
+    }
+  ],
+  "dev_dependencies": [
+    {
+      "name": "mock_token.aleo",
+      "location": "local",
+      "path": "/Users/monkey/dev/project/pactpay/pactpay-aleo/contracts/mock_token",
+      "edition": null
+    }
+  ]
+}

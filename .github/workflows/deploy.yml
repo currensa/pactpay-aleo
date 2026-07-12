@@ -1,0 +1,45 @@
+# Required GitHub secrets:
+#   PACT_SSH_HOST              — server IP or hostname
+#   PACT_SSH_USER              — SSH login user
+#   PACT_SSH_KEY               — SSH private key (Ed25519 / RSA)
+#   DEPLOY_PATH                — absolute path of this repository on the server
+
+name: Deploy PactPay
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: staging
+
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1
+        env:
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+        with:
+          host: ${{ secrets.PACT_SSH_HOST }}
+          username: ${{ secrets.PACT_SSH_USER }}
+          key: ${{ secrets.PACT_SSH_KEY }}
+          envs: DEPLOY_PATH
+          script: |
+            set -e
+
+            # Load Node 24 via nvm.
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            nvm use 24
+
+            cd "$DEPLOY_PATH"
+            git pull origin main
+            npm ci
+            npm run build
+
+            # Reload if already running, otherwise start the Next.js app on port 7000.
+            pm2 reload pactpay-aleo --update-env 2>/dev/null \
+              || pm2 start npm --name pactpay-aleo -- run web
+
+            pm2 save
