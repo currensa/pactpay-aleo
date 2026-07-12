@@ -1,11 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Receipt, Send, ShieldCheck } from "lucide-react";
+import { Receipt, Send } from "lucide-react";
 import {
   buildEscrowWithdrawTx,
   payrollNoteTokenProgram,
-  programs,
   type BuiltTransaction
 } from "@/lib/aleo";
 import { ErrorDetails, errorText } from "./ErrorDetails";
@@ -40,8 +39,7 @@ export function WithdrawPage() {
 
     function onWalletAddress(event: Event) {
       const address = (event as WalletAddressEvent).detail?.address;
-      if (!address) return;
-      setPayoutTo((current) => current || address);
+      setPayoutTo(address ?? "");
     }
 
     window.addEventListener("pactpay:wallet-address", onWalletAddress);
@@ -76,17 +74,6 @@ export function WithdrawPage() {
 
   return (
     <>
-      <section className="summaryBand compact">
-        <div>
-          <span className="eyebrow">Withdraw</span>
-          <h1>Spend a payroll note into the selected escrow asset.</h1>
-          <div className="deploymentLine">
-            <span>{programs.payroll}</span>
-            <span>{programs.token}</span>
-          </div>
-        </div>
-      </section>
-
       <div className="workspace pageGrid">
         <section className="panel wide">
           <div className="panelHeader">
@@ -126,17 +113,6 @@ export function WithdrawPage() {
             <Send size={18} />
             Build withdraw call
           </button>
-        </section>
-
-        <section className="panel">
-          <div className="panelHeader">
-            <div>
-              <span className="eyebrow">Ownership</span>
-              <h2>Receiver controlled</h2>
-            </div>
-            <ShieldCheck size={20} />
-          </div>
-          <p className="mutedText">A withdraw call consumes the receiver-owned private record. The payout address can be different from the record owner if the receiver chooses it.</p>
         </section>
 
         <TransactionPanel tx={tx} />

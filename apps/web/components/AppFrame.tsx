@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Banknote, Send, ShieldCheck, UserRound } from "lucide-react";
-import { networkConfig } from "@/lib/aleo";
 import { WalletLogin } from "./WalletLogin";
 
 const navItems = [
@@ -34,7 +33,6 @@ export function AppFrame({ children }: { children: React.ReactNode }) {
             );
           })}
         </nav>
-        <div className="network">{networkConfig.network}</div>
       </header>
 
       <WalletLogin />

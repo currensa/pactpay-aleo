@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Banknote, Copy, Droplets, ExternalLink, Database, RefreshCw, ShieldCheck, UserRound, WalletCards } from "lucide-react";
-import { buildMintMockArc, networkConfig, programs, type BuiltTransaction } from "@/lib/aleo";
-import { executeAleoTransaction, inspectWalletCapabilities, type WalletCapabilityReport } from "@/lib/shield";
+import { useCallback, useEffect, useState } from "react";
+import { Banknote, Copy, Droplets, ExternalLink, UserRound } from "lucide-react";
+import { buildMintMockArc, type BuiltTransaction } from "@/lib/aleo";
+import { executeAleoTransaction } from "@/lib/shield";
 import { ErrorDetails, errorText } from "./ErrorDetails";
 import { TransactionPanel } from "./TransactionPanel";
 
@@ -23,8 +23,6 @@ export function AccountPage() {
   const [user, setUser] = useState<StoredUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
-  const [capabilities, setCapabilities] = useState<WalletCapabilityReport[]>([]);
-  const [copiedCapabilities, setCopiedCapabilities] = useState(false);
   const [faucetStatus, setFaucetStatus] = useState("");
   const [mintAmount, setMintAmount] = useState("1000u64");
   const [mockHolder, setMockHolder] = useState("");
@@ -33,46 +31,36 @@ export function AccountPage() {
   const [mintTx, setMintTx] = useState<BuiltTransaction | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    let mounted = true;
-    fetch("/api/wallet-login")
-      .then((response) => response.json())
-      .then((payload: { user: StoredUser | null }) => {
-        if (!mounted) return;
-        setUser(payload.user);
-        setMockHolder((current) => current || payload.user?.address || "");
-        setLoading(false);
-      })
-      .catch(() => {
-        if (!mounted) return;
-        setLoading(false);
-      });
-
-    return () => {
-      mounted = false;
-    };
+  const loadSession = useCallback(async () => {
+    try {
+      const response = await fetch("/api/wallet-login");
+      if (!response.ok) throw new Error("Unable to load wallet session.");
+      const payload = (await response.json()) as { user: StoredUser | null };
+      setUser(payload.user);
+      setMockHolder((current) => current || payload.user?.address || "");
+    } catch {
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
-    refreshCapabilities();
-  }, []);
+    void loadSession();
+
+    function onWalletAddress() {
+      void loadSession();
+    }
+
+    window.addEventListener("pactpay:wallet-address", onWalletAddress);
+    return () => window.removeEventListener("pactpay:wallet-address", onWalletAddress);
+  }, [loadSession]);
 
   function copyAddress() {
     if (!user) return;
     navigator.clipboard.writeText(user.address).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 1400);
-    });
-  }
-
-  function refreshCapabilities() {
-    setCapabilities(inspectWalletCapabilities());
-  }
-
-  function copyCapabilities() {
-    navigator.clipboard.writeText(JSON.stringify(capabilities, null, 2)).then(() => {
-      setCopiedCapabilities(true);
-      setTimeout(() => setCopiedCapabilities(false), 1400);
     });
   }
 
@@ -111,17 +99,6 @@ export function AccountPage() {
 
   return (
     <>
-      <section className="summaryBand compact">
-        <div>
-          <span className="eyebrow">Account</span>
-          <h1>Wallet session and deployed programs.</h1>
-          <div className="deploymentLine">
-            <span>{programs.payroll}</span>
-            <span>{programs.token}</span>
-          </div>
-        </div>
-      </section>
-
       <div className="workspace pageGrid">
         <section className="panel wide">
           <div className="panelHeader">
@@ -156,22 +133,6 @@ export function AccountPage() {
           ) : (
             <p className="mutedText">Connect Shield from the wallet bar to create a local session.</p>
           )}
-        </section>
-
-        <section className="panel">
-          <div className="panelHeader">
-            <div>
-              <span className="eyebrow">Network</span>
-              <h2>{networkConfig.network}</h2>
-            </div>
-            <ShieldCheck size={20} />
-          </div>
-          <div className="detailList">
-            <div>
-              <label>Endpoint</label>
-              <code>{networkConfig.endpoint}</code>
-            </div>
-          </div>
         </section>
 
         <section className="panel">
@@ -218,88 +179,10 @@ export function AccountPage() {
           {mintStatus ? <p className="inlineNotice">{mintStatus}</p> : null}
         </section>
 
-        <section className="panel">
-          <div className="panelHeader">
-            <div>
-              <span className="eyebrow">Local data</span>
-              <h2>SQLite session store</h2>
-            </div>
-            <Database size={20} />
-          </div>
-          <p className="mutedText">The app stores wallet sessions and future payroll-note metadata locally. It does not store private keys or view keys.</p>
-        </section>
-
-        <section className="panel wide">
-          <div className="panelHeader">
-            <div>
-              <span className="eyebrow">Wallet capability inspector</span>
-              <h2>Injected Aleo providers</h2>
-            </div>
-            <WalletCards size={20} />
-          </div>
-
-          <div className="buttonRow">
-            <button className="primary secondary" type="button" onClick={refreshCapabilities}>
-              <RefreshCw size={16} />
-              Refresh
-            </button>
-            <button className="primary secondary" type="button" disabled={!capabilities.length} onClick={copyCapabilities}>
-              <Copy size={16} />
-              Copy report
-            </button>
-            {copiedCapabilities ? <p className="inlineNotice">Capability report copied.</p> : null}
-          </div>
-
-          <div className="capabilityGrid">
-            {capabilities.map((report) => (
-              <article className="capabilityCard" key={report.key}>
-                <div className="capabilityHeader">
-                  <div>
-                    <strong>{report.name}</strong>
-                    <span>{report.key}</span>
-                  </div>
-                  <label className={report.detected ? "statusPill ok" : "statusPill"}>{report.detected ? "Detected" : "Missing"}</label>
-                </div>
-
-                {report.detected ? (
-                  <div className="capabilitySections">
-                    <CapabilityGroup title="Execution" values={report.executionKeys} />
-                    <CapabilityGroup title="Signing" values={report.signingKeys} />
-                    <CapabilityGroup title="Records" values={report.recordKeys} />
-                    <CapabilityGroup title="Accounts" values={report.accountKeys} />
-                    <CapabilityGroup title="All functions" values={report.functionKeys} />
-                    <CapabilityGroup title="Own keys" values={report.ownKeys} />
-                    <CapabilityGroup title="Prototype keys" values={report.prototypeKeys} />
-                  </div>
-                ) : (
-                  <p className="mutedText">No provider object is available on <code>window.{report.key}</code>.</p>
-                )}
-              </article>
-            ))}
-          </div>
-        </section>
-
         <TransactionPanel tx={mintTx} />
       </div>
 
       <ErrorDetails message={error} onClose={() => setError(null)} />
     </>
-  );
-}
-
-function CapabilityGroup({ title, values }: { title: string; values: string[] }) {
-  return (
-    <div className="capabilityGroup">
-      <label>{title}</label>
-      {values.length ? (
-        <div className="methodList">
-          {values.map((value) => (
-            <code key={value}>{value}</code>
-          ))}
-        </div>
-      ) : (
-        <span>No matching methods</span>
-      )}
-    </div>
   );
 }

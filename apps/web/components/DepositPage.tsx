@@ -8,7 +8,6 @@ import {
   buildFundArcEscrow,
   buildFundCreditsEscrow,
   DEFAULT_ARC_TOKEN_IDENTIFIER,
-  programs,
   type BuiltTransaction
 } from "@/lib/aleo";
 import { executeAleoTransaction } from "@/lib/shield";
@@ -170,27 +169,6 @@ export function DepositPage() {
 
   return (
     <>
-      <section className="summaryBand compact">
-        <div>
-          <span className="eyebrow">Deposit</span>
-          <h1>Fund escrow and issue private payroll notes.</h1>
-          <div className="deploymentLine">
-            <span>{programs.payroll}</span>
-            <span>{programs.token}</span>
-          </div>
-        </div>
-        <div className="metrics">
-          <div>
-            <span>{selectedReceiverCount}</span>
-            <label>Rows / 16</label>
-          </div>
-          <div>
-            <span>{Number.isFinite(total) ? total : 0}</span>
-            <label>Allocated</label>
-          </div>
-        </div>
-      </section>
-
       <div className="workspace">
         <section className="panel">
           <div className="panelHeader">
