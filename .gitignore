@@ -13,3 +13,5 @@ build
 *.sqlite-wal
 
 output
+
+nginx.conf
