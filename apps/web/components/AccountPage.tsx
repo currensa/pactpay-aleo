@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Banknote, Copy, Droplets, ExternalLink, UserRound } from "lucide-react";
+import { Banknote, Copy, Droplets, ExternalLink, RefreshCw, UserRound } from "lucide-react";
 import { buildMintMockArc, type BuiltTransaction } from "@/lib/aleo";
 import { executeAleoTransaction } from "@/lib/shield";
 import { ErrorDetails, errorText } from "./ErrorDetails";
@@ -14,9 +14,29 @@ type StoredUser = {
   lastSeenAt: string;
 };
 
+type Balances = {
+  credits: string;
+  mockToken: string;
+};
+
 function shortAddress(address: string) {
   if (address.length <= 22) return address;
   return `${address.slice(0, 12)}...${address.slice(-8)}`;
+}
+
+function amountValue(value: string) {
+  return value.replace(/u64$/i, "").trim();
+}
+
+function aleoValue(value: string) {
+  try {
+    const microcredits = BigInt(amountValue(value) || "0");
+    const whole = microcredits / 1_000_000n;
+    const fraction = (microcredits % 1_000_000n).toString().padStart(6, "0").replace(/0+$/, "");
+    return fraction ? `${whole}.${fraction}` : whole.toString();
+  } catch {
+    return amountValue(value);
+  }
 }
 
 export function AccountPage() {
@@ -30,6 +50,31 @@ export function AccountPage() {
   const [mintStatus, setMintStatus] = useState("");
   const [mintTx, setMintTx] = useState<BuiltTransaction | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [balances, setBalances] = useState<Balances | null>(null);
+  const [balancesLoading, setBalancesLoading] = useState(false);
+  const [balancesError, setBalancesError] = useState("");
+
+  const loadBalances = useCallback(async (address: string | null) => {
+    if (!address) {
+      setBalances(null);
+      setBalancesError("");
+      return;
+    }
+
+    setBalancesLoading(true);
+    setBalancesError("");
+    try {
+      const response = await fetch(`/api/balances?address=${encodeURIComponent(address)}`, { cache: "no-store" });
+      const payload = (await response.json()) as Balances & { error?: string };
+      if (!response.ok) throw new Error(payload.error ?? "Unable to load balances.");
+      setBalances({ credits: payload.credits, mockToken: payload.mockToken });
+    } catch (cause) {
+      setBalances(null);
+      setBalancesError(cause instanceof Error ? cause.message : "Unable to load balances.");
+    } finally {
+      setBalancesLoading(false);
+    }
+  }, []);
 
   const loadSession = useCallback(async () => {
     try {
@@ -38,12 +83,14 @@ export function AccountPage() {
       const payload = (await response.json()) as { user: StoredUser | null };
       setUser(payload.user);
       setMockHolder((current) => current || payload.user?.address || "");
+      void loadBalances(payload.user?.address ?? null);
     } catch {
       setUser(null);
+      void loadBalances(null);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [loadBalances]);
 
   useEffect(() => {
     void loadSession();
@@ -132,6 +179,42 @@ export function AccountPage() {
             </div>
           ) : (
             <p className="mutedText">Connect Shield from the wallet bar to create a local session.</p>
+          )}
+        </section>
+
+        <section className="panel">
+          <div className="panelHeader">
+            <div>
+              <span className="eyebrow">Balances</span>
+              <h2>Available funds</h2>
+            </div>
+            <button
+              className="iconButton"
+              type="button"
+              title="Refresh balances"
+              disabled={!user || balancesLoading}
+              onClick={() => void loadBalances(user?.address ?? null)}
+            >
+              <RefreshCw size={17} />
+            </button>
+          </div>
+          {user ? (
+            balances ? (
+              <div className="detailList">
+                <div>
+                  <label>ALEO</label>
+                  <strong>{aleoValue(balances.credits)} ALEO</strong>
+                </div>
+                <div>
+                  <label>mock_token</label>
+                  <strong>{amountValue(balances.mockToken)} MOCK</strong>
+                </div>
+              </div>
+            ) : (
+              <p className="mutedText">{balancesLoading ? "Loading balances…" : balancesError || "Balances are unavailable."}</p>
+            )
+          ) : (
+            <p className="mutedText">Connect a wallet to view balances.</p>
           )}
         </section>
 
