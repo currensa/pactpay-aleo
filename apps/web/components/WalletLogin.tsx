@@ -107,15 +107,35 @@ export function WalletLogin({ onAddressChange }: Props) {
     }
   }
 
+  async function copyAddress() {
+    if (!user) return;
+
+    try {
+      await navigator.clipboard.writeText(user.address);
+      setStatus("Address copied");
+      window.setTimeout(() => {
+        if (mountedRef.current) setStatus("Connected");
+      }, 1400);
+    } catch {
+      setStatus("Unable to copy address");
+    }
+  }
+
   return (
     <section className="walletBar" aria-label="Wallet login">
-      <div className="walletIdentity">
+      <button
+        className="walletIdentity"
+        type="button"
+        disabled={!user}
+        title={user ? "Copy wallet address" : undefined}
+        onClick={copyAddress}
+      >
         <ShieldCheck size={20} />
         <div>
           <span>{user ? shortAddress(user.address) : "Shield wallet"}</span>
           <label>{user ? user.walletName : status}</label>
         </div>
-      </div>
+      </button>
       <div className="walletActions">
         <span className="walletStatus">{status}</span>
         {user ? (

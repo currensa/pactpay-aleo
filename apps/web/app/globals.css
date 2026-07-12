@@ -162,7 +162,17 @@ main::before {
 }
 
 .walletIdentity {
+  background: transparent;
+  border: 0;
   color: var(--accent-strong);
+  cursor: pointer;
+  padding: 0;
+  text-align: left;
+}
+
+.walletIdentity:disabled {
+  cursor: default;
+  opacity: 1;
 }
 
 .walletIdentity div {
