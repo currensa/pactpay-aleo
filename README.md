@@ -57,3 +57,11 @@ There is no refund path in this version. Receiver identity, token program, and a
 ARC settlement accepts an arbitrary ARC-compatible public token program. This makes the demo economically meaningful without revealing a deposit id or batch id during withdrawal. The tradeoff is intentional: token type, escrow balances, payout amounts, and payout addresses are public settlement metadata.
 
 This is a demo architecture. Production use should replace the mock ARC token with an audited ARC implementation, add stronger off-chain note delivery, view-key UX, and deployment scripts for the target Aleo network.
+
+## UX Overview
+
+After starting the web app, connect an unlocked Shield wallet from the wallet bar. The Account page shows the active address and provides links to testnet credits and demo ARC tokens.
+
+Use **Deposit** to choose a token, fund escrow, and build a private payroll for up to 16 recipients. Each wallet transaction requires confirmation in Shield. Recipients can then open **Withdraw**, select one of their private payroll notes, enter an amount and public payout address, and build the withdrawal call. Partial withdrawals return the remaining balance as a new private note.
+
+The interface is a demo transaction builder: review every request in the wallet before approving it, and use testnet or mock assets only.
